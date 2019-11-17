@@ -13,7 +13,7 @@ app = Flask(__name__)
 # fire status global variable
 fire_pistatus = 0
 
-def mySQL(sqltype,tablename,where):
+def mySQL(sqltype,tablename,where,value,time):
     # MySQL Connection, Access databse
     db = pymysql.connect(host='localhost', user='sion', password='flytothemoon', db='flytothemoon', charset='utf8', use_unicode=True)
 
@@ -21,12 +21,31 @@ def mySQL(sqltype,tablename,where):
     cursor = db.cursor()
 
     # Write SQL Query
-    if (sqltype == 'select') :
+    if (sqltype == 'showall') :
         try :
             sql = "select * from "+tablename
             print(sql)
             cursor.execute(sql)
             rows = cursor.fetchall()
+            return rows
+        finally :
+            db.close()
+
+
+    elif (sqltype == 'findvalue') :
+        try :
+            sql = "select value from "+tablename+" where time='"+time+"' and place='"+where+"' and value='"+value+"'"
+            print(sql)
+            cursor.execute(sql)
+            rows = cursor.fetchone()
+            print (rows)
+            if (rows == None) :
+                rows = 0
+                return rows
+            elif 1 in rows :
+                rows = 1
+            else :
+                rows = 0
             return rows
         finally :
             db.close()
@@ -40,6 +59,17 @@ def mySQL(sqltype,tablename,where):
             return cursor.lastrowid
         finally :
             db.close()
+
+    elif (sqltype == 'insertvalue') :
+        try :
+            sql = "INSERT INTO "+tablename+" (place,value,time) VALUES ('"+where+"','"+value+"','"+time+"')"
+            print(sql)
+            cursor.execute(sql)
+            db.commit()
+            return cursor.lastrowid
+        finally :
+            db.close()
+
 
     elif (sqltype == 'update') :
         print("update")
@@ -103,19 +133,40 @@ def testCall(text):
 @app.route('/arduino', methods=['GET'])
 def arduino():
     global fire_pistatus
+    sqltype1 = None
+    sqltype2 = None
+    table1 = None
+    table2 = None
+    where1 = None
+    where2 = None
+    value1 = None
+    value2 = None
+    time = None
     if (fire_pistatus == 1) :
         # if fire_pistatus is int 1, then return string 1
         return 'y'
 
     elif request.method == 'GET' :
-        sqltype = request.args.get("sqltype")
-        tablename = request.args.get("tablename")
-        where = request.args.get("where")
-        value = request.args.get("value")
+        sqltype1 = request.args.get("sqltype1")
+        sqltype2 = request.args.get("sqltype2")
+        table1 = request.args.get("table1")
+        table2 = request.args.get("table2")
+        where1 = request.args.get("where1")
+        where2 = request.args.get("where2")
+        value1 = request.args.get("value1")
+        value2 = request.args.get("value2")
+        time = request.args.get("time")
 	
-        if ( sqltype == 'insert' ) :
-            mySQL(sqltype=sqltype, tablename=tablename, where=where)
-        return 'n'
+        if ( sqltype1 != None ) :
+            result = mySQL(sqltype=sqltype1, tablename=table1, where=where1, value=value1, time=time)
+
+        if ( sqltype2 != None ) : 
+            result = mySQL(sqltype=sqltype2, tablename=table2, where=where2, value=value2, time=time)
+
+        if ( result == 1 ):
+            return 'y'
+        else :
+            return 'n'
 
     else :
         return "Check your request..."
@@ -128,22 +179,27 @@ def arduino_web():
         return '1'
 
     elif request.method == 'GET' :
-        sqltype = request.args.get("sqltype")
-        tablename = request.args.get("tablename")
-        where = request.args.get("where")
+        sqltype = request.args.get("sqltype1")
+        tablename = request.args.get("table1")
+        where = request.args.get("where1")
+        value = request.args.get("value1")
+        time = request.args.get("time")
 		
-        result = mySQL(sqltype=sqltype, tablename=tablename, where=where)
+        result = mySQL(sqltype=sqltype, tablename=tablename, where=where, value=value, time=time)
 
-        if (sqltype == 'select') :
+        if (sqltype == 'showall') :
             return render_template('selectdb.html', result=result) 
         elif (sqltype == 'insert'):
-            selectedrows = mySQL(sqltype="select", tablename=tablename, where=where)
+            selectedrows = mySQL(sqltype="showall", tablename=tablename, where=where, value=value, time=time)
             return render_template('insertdb.html', result=selectedrows, lastrowid=result)
+        elif (sqltype == 'findvalue') :
+            print ("Check point #1")
+            return "Found value is %d." % result
+        elif (sqltype == 'insertvalue') :
+            return "insert value finished. "
 
     else :
         return "Check your request..."
-
-    return action
 
 @app.route('/pi')
 def pi():
