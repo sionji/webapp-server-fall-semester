@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>로그인</title>
+  </head>
+  <body>
+    <table border=1>
+    <form action="loginSuccess" method="POST">
+      아이디 및 패스워드를 정확하게 입력 해 주십시오.
+      <div>
+        <td><label for="name">아이디</label></td>
+        <td><input type="textbox" name="user_id" size="15"></td>
+      </div>
+
+      <div>
+        <td><label for="password">패스워드</label></td>
+        <td><input type="password" name="user_pw"size=15></td>
+      </div>
+
+      <div class="button" style="position:absolute; left:450px;">
+        <button type="submit" name="button">로그인</button>
+      </div>
+    </form>
+    </table>
+  </body>
+</html>

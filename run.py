@@ -4,7 +4,8 @@ from flask import Flask, render_template, url_for, request, redirect
 from subprocess import call, PIPE, Popen
 from firebase import firebase
 from pyfcm import FCMNotification
-import psutil, datetime
+from datetime import datetime
+import psutil
 import json
 import pymysql
 
@@ -12,6 +13,11 @@ app = Flask(__name__)
 
 # fire status global variable
 fire_pistatus = 0
+
+def get_num_RTC () :
+    now = datetime.now()
+   
+    return str(now.month) + str(now.day) + str(now.hour)
 
 def mySQL(sqltype,tablename,where,value,time):
     # MySQL Connection, Access databse
@@ -38,7 +44,27 @@ def mySQL(sqltype,tablename,where,value,time):
             print(sql)
             cursor.execute(sql)
             rows = cursor.fetchone()
-            print (rows)
+            #print (rows)
+            if (rows == None) :
+                rows = 0
+                return rows
+            elif 1 in rows :
+                rows = 1
+            else :
+                rows = 0
+            return rows
+        finally :
+            db.close()
+
+
+    elif (sqltype == 'findvalue_rtc') :
+        try :
+            rtc = get_num_RTC ()
+            sql = "select value from "+tablename+" where time='"+rtc+"' and place='"+tablename+"' and value='1'"
+            print(sql)
+            cursor.execute(sql)
+            rows = cursor.fetchone()
+            #print (rows)
             if (rows == None) :
                 rows = 0
                 return rows
@@ -113,6 +139,8 @@ def fire_occurs(input_pistatus):
     # fire_pistatus and input_pistatus is int type data
     if (fire_pistatus == 0 and input_pistatus == 1) :
         fire_pistatus = input_pistatus
+        duckbase.patch('/maze/f1', {'i' : "20"})
+        duckbase.patch('/maze/f1', {'j' : "40"})
         message = fcm_datapush('Fire Occured!', 'Touch to see evacuation route.')
         print(message)
         return 'Global variable is %d' % fire_pistatus
@@ -192,8 +220,7 @@ def arduino_web():
         elif (sqltype == 'insert'):
             selectedrows = mySQL(sqltype="showall", tablename=tablename, where=where, value=value, time=time)
             return render_template('insertdb.html', result=selectedrows, lastrowid=result)
-        elif (sqltype == 'findvalue') :
-            print ("Check point #1")
+        elif (sqltype == 'findvalue' or sqltype == 'findvalue_rtc') :
             return "Found value is %d." % result
         elif (sqltype == 'insertvalue') :
             return "insert value finished. "
@@ -246,9 +273,22 @@ def firebase_database():
     print(action)
     return (''), 204
 
+@app.route('/time', methods=['GET'])
+def what_time_is_now () :
+    RTC = get_num_RTC ()
+    return RTC
+
 @app.errorhandler(404)
 def page_not_found(error):
     return 'page_not_found_error(404)'
+
+@app.route('/login')
+def main_get():
+    return render_template('start.html')
+
+@app.route('/again')
+def again_login():
+    return render_template('again.html')
 
 # app run
 if __name__ == '__main__':
