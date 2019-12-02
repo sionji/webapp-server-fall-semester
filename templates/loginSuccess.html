@@ -2,12 +2,35 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>관리자 페이지</title>
   </head>
   <body>
-    {% for user_id in result.items() %}
+      <td><label for="name">관리자 계정 : {{user_id}} 님</label></td>
+      <form action="http://155.230.25.126:11066/login" method="POST">
+        <div class="button" style="position:static;">
+          <button type="submit" name="logout">로그아웃</button>
+        </div>
+      </form>
 
-    {{user_id}}
-
+      <div class="button" style="position:absolute; top: 10%; left:200px;">
+        <td><label for="name">1번 자동문</label></td>
+        <button type="submit" name="button1">OPEN</button>
+        <button type="submit" name="button1">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 20%; left:200px;">
+        <td><label for="name">2번 자동문</label></td>
+        <button type="submit" name="button2">OPEN</button>
+        <button type="submit" name="button2">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 30%; left:200px;">
+        <td><label for="name">3번 자동문</label></td>
+        <button type="submit" name="button2">OPEN</button>
+        <button type="submit" name="button2">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 40%; left:200px;">
+        <td><label for="name">4번 자동문</label></td>
+        <button type="submit" name="button2">OPEN</button>
+        <button type="submit" name="button2">CLOSE</button>
+      </div>
   </body>
 </html>

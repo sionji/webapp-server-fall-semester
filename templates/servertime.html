@@ -1,0 +1,32 @@
+<style>
+    table {
+        front-family : arial, sans-serif;
+        border-collapse : collapse;
+    }
+    td, th {
+        border : 1px solid #dddddd;
+        text-align : center;
+        padding : 4px;
+    }
+    tr :nth-child(even){
+
+    }
+</style>
+
+<!DOCTYPE html>
+	<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="5">
+		<title>
+		    FLTM Server Time	
+		</title>
+
+	</head>
+
+	<body>
+		<h1> Current Server time in table : {{ tablename }} </h1>
+        <h2> MM-DD-HH (Month-Date-Hour)</h2>
+        <h1> {{ modtime }}</h1>
+	<body>
+</html>
+

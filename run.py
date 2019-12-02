@@ -19,6 +19,20 @@ def get_num_RTC () :
    
     return str(now.month) + str(now.day) + str(now.hour)
 
+#Return _id which is calculated by RTC.
+def get_mod_RTC () :
+    now = datetime.now()
+
+    hour = now.hour
+    minute = now.minute
+    second = now.second
+
+    retval = 3600 * hour + 60 * minute + second
+    retval = retval % 33000
+    retval = str(retval / 10)
+
+    return retval
+
 def mySQL(sqltype,tablename,where,value,time):
     # MySQL Connection, Access databse
     db = pymysql.connect(host='localhost', user='sion', password='flytothemoon', db='flytothemoon', charset='utf8', use_unicode=True)
@@ -56,11 +70,10 @@ def mySQL(sqltype,tablename,where,value,time):
         finally :
             db.close()
 
-
-    elif (sqltype == 'findvalue_rtc') :
+    elif (sqltype == 'findvalue_rtc_id') :
         try :
-            rtc = get_num_RTC ()
-            sql = "select value from "+tablename+" where time='"+rtc+"' and place='"+tablename+"' and value='1'"
+            _id = get_mod_RTC ()
+            sql = "select value from "+tablename+" where _id='"+_id+"'"
             print(sql)
             cursor.execute(sql)
             rows = cursor.fetchone()
@@ -72,6 +85,36 @@ def mySQL(sqltype,tablename,where,value,time):
                 rows = 1
             else :
                 rows = 0
+            return rows
+        finally :
+            db.close()
+
+    elif (sqltype == 'findvalue_rtc') :
+        try :
+            rtc = get_num_RTC ()
+            sql = "select value from "+tablename+" where time='"+rtc+"' and place='"+tablename+"'"
+            print(sql)
+            cursor.execute(sql)
+            rows = cursor.fetchone()
+            #print (rows)
+            if (rows == None) :
+                rows = 0
+                return rows
+            elif 1 in rows :
+                rows = 1
+            else :
+                rows = 0
+            return rows
+        finally :
+            db.close()
+
+    elif (sqltype == 'findtime_id') :
+        try :
+            _id = get_mod_RTC ()
+            sql = "select * from "+tablename+" where _id='"+_id+"'"
+            print(sql)
+            cursor.execute(sql)
+            rows = cursor.fetchone()
             return rows
         finally :
             db.close()
@@ -132,6 +175,16 @@ def get_cpu_temperature():
 @app.route('/')
 def basic():
     return 'Fly to the Moon Graduate Project'
+
+@app.route('/servertime/', methods=['GET'])
+def servertime():
+    sqltype = 'findtime_id' 
+    tablename = request.args.get("table1")
+    row = mySQL(sqltype=sqltype, tablename=tablename, where=None, value=None, time=None)
+    modtime = str(row[1])
+    time_s = modtime[0:2] + '-' + modtime[2:4] + '-' + modtime[4:6]
+    print (time_s)
+    return render_template('servertime.html', modtime=time_s, tablename=tablename)
 
 @app.route('/fire/<int:input_pistatus>')
 def fire_occurs(input_pistatus):
@@ -202,6 +255,12 @@ def arduino():
 @app.route('/arduino/web', methods=['GET'])
 def arduino_web():
     global fire_pistatus
+    sqltype = None
+    tablename = None
+    where = None
+    value = None
+    time = None
+
     if (fire_pistatus == 1) :
         # if fire_pistatus is int 1, then return string 1
         return '1'
@@ -220,7 +279,7 @@ def arduino_web():
         elif (sqltype == 'insert'):
             selectedrows = mySQL(sqltype="showall", tablename=tablename, where=where, value=value, time=time)
             return render_template('insertdb.html', result=selectedrows, lastrowid=result)
-        elif (sqltype == 'findvalue' or sqltype == 'findvalue_rtc') :
+        elif (sqltype == 'findvalue' or sqltype == 'findvalue_rtc' or sqltype == 'findvalue_rtc_id') :
             return "Found value is %d." % result
         elif (sqltype == 'insertvalue') :
             return "insert value finished. "
@@ -273,22 +332,24 @@ def firebase_database():
     print(action)
     return (''), 204
 
-@app.route('/time', methods=['GET'])
-def what_time_is_now () :
-    RTC = get_num_RTC ()
-    return RTC
-
 @app.errorhandler(404)
 def page_not_found(error):
     return 'page_not_found_error(404)'
 
-@app.route('/login')
-def main_get():
+@app.route('/login', methods=['POST','GET'])
+def login():
     return render_template('start.html')
 
-@app.route('/again')
-def again_login():
-    return render_template('again.html')
+@app.route('/loginSuccess', methods=['POST','GET'])
+def login_result():
+    if request.method == 'POST':
+        user_id = request.form['user_id']
+        user_pw = request.form['user_pw']
+        if user_id == 'fly' and user_pw == 'moon' :
+            return render_template("loginSuccess.html", user_id = user_id)
+        else :
+            return render_template("again.html")
+
 
 # app run
 if __name__ == '__main__':

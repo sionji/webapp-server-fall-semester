@@ -6,18 +6,15 @@
   </head>
   <body>
     <table border=1>
-    <form action="again" method="POST">
-      <div>
-        <td><label for="name">아이디</label></td>
-        <td><input type="textbox" name="user_id" size="15"></td>
-      </div>
+    <form action="http://155.230.25.126:11066/loginSuccess" method="POST">
+      <table width=600px height=50px border="1" align="center" style="table-layout:fixed;">
+        <td align="center"><label for="name">아이디</label></td>
+        <td align="center"><input type="textbox" name="user_id" size="10"></td>
+        <td align="center"><label for="password">패스워드</label></td>
+        <td align="center"><input type="password" name="user_pw"size=10></td>
+      </table>
 
-      <div>
-        <td><label for="password">패스워드</label></td>
-        <td><input type="password" name="user_pw"size=15></td>
-      </div>
-
-      <div class="button" style="position:absolute; left:450px;">
+      <div class="button" style="position:absolute; left:47%; top:8%;">
         <button type="submit" name="button">로그인</button>
       </div>
     </form>
