@@ -1,150 +1,53 @@
 #-*- coding : utf-8 -*-
-
+#import official module
 from flask import Flask, render_template, url_for, request, redirect
 from subprocess import call, PIPE, Popen
 from firebase import firebase
 from pyfcm import FCMNotification
 from datetime import datetime
+import requests
 import psutil
 import json
-import pymysql
+
+#import custom module
+import binarysearch
+from mySQL import *
 
 app = Flask(__name__)
 
 # fire status global variable
 fire_pistatus = 0
+# maze pointer must be string
+maze_i = '20'
+maze_j = '40'
+#firebase realtime database
+thread = None
+duckbase = firebase.FirebaseApplication('https://gradeprojectoreo.firebaseio.com/', None)
+sionbase = firebase.FirebaseApplication('https://graduate-project-c0c01.firebaseio.com/', None)
 
-def get_num_RTC () :
-    now = datetime.now()
+def change_fire_case (case) :
+    global maze_i, maze_j
+    # Case sensitivity
+    if (case == 0) :
+        maze_i = '20'
+        maze_j = '40'
+
+    elif (case == 1) :
+        maze_i = '20'
+        maze_j = '40'
    
-    return str(now.month) + str(now.day) + str(now.hour)
+    elif (case == 2) :
+        maze_i = '20'
+        maze_j = '40'
+    
+    elif (case == 3) :
+        maze_i = '20'
+        maze_j = '40'
+   
+    elif (case == 4) :
+        maze_i = '20'
+        maze_j = '40'
 
-#Return _id which is calculated by RTC.
-def get_mod_RTC () :
-    now = datetime.now()
-
-    hour = now.hour
-    minute = now.minute
-    second = now.second
-
-    retval = 3600 * hour + 60 * minute + second
-    retval = retval % 33000
-    retval = str(retval / 10)
-
-    return retval
-
-def mySQL(sqltype,tablename,where,value,time):
-    # MySQL Connection, Access databse
-    db = pymysql.connect(host='localhost', user='sion', password='flytothemoon', db='flytothemoon', charset='utf8', use_unicode=True)
-
-    # Make Cursor from Connection
-    cursor = db.cursor()
-
-    # Write SQL Query
-    if (sqltype == 'showall') :
-        try :
-            sql = "select * from "+tablename
-            print(sql)
-            cursor.execute(sql)
-            rows = cursor.fetchall()
-            return rows
-        finally :
-            db.close()
-
-
-    elif (sqltype == 'findvalue') :
-        try :
-            sql = "select value from "+tablename+" where time='"+time+"' and place='"+where+"' and value='"+value+"'"
-            print(sql)
-            cursor.execute(sql)
-            rows = cursor.fetchone()
-            #print (rows)
-            if (rows == None) :
-                rows = 0
-                return rows
-            elif 1 in rows :
-                rows = 1
-            else :
-                rows = 0
-            return rows
-        finally :
-            db.close()
-
-    elif (sqltype == 'findvalue_rtc_id') :
-        try :
-            _id = get_mod_RTC ()
-            sql = "select value from "+tablename+" where _id='"+_id+"'"
-            print(sql)
-            cursor.execute(sql)
-            rows = cursor.fetchone()
-            #print (rows)
-            if (rows == None) :
-                rows = 0
-                return rows
-            elif 1 in rows :
-                rows = 1
-            else :
-                rows = 0
-            return rows
-        finally :
-            db.close()
-
-    elif (sqltype == 'findvalue_rtc') :
-        try :
-            rtc = get_num_RTC ()
-            sql = "select value from "+tablename+" where time='"+rtc+"' and place='"+tablename+"'"
-            print(sql)
-            cursor.execute(sql)
-            rows = cursor.fetchone()
-            #print (rows)
-            if (rows == None) :
-                rows = 0
-                return rows
-            elif 1 in rows :
-                rows = 1
-            else :
-                rows = 0
-            return rows
-        finally :
-            db.close()
-
-    elif (sqltype == 'findtime_id') :
-        try :
-            _id = get_mod_RTC ()
-            sql = "select * from "+tablename+" where _id='"+_id+"'"
-            print(sql)
-            cursor.execute(sql)
-            rows = cursor.fetchone()
-            return rows
-        finally :
-            db.close()
-
-    elif (sqltype == 'insert') :
-        try :
-            sql = "INSERT INTO "+tablename+" (place) VALUES ('"+where+"')"
-            print(sql)
-            cursor.execute(sql)
-            db.commit()
-            return cursor.lastrowid
-        finally :
-            db.close()
-
-    elif (sqltype == 'insertvalue') :
-        try :
-            sql = "INSERT INTO "+tablename+" (place,value,time) VALUES ('"+where+"','"+value+"','"+time+"')"
-            print(sql)
-            cursor.execute(sql)
-            db.commit()
-            return cursor.lastrowid
-        finally :
-            db.close()
-
-
-    elif (sqltype == 'update') :
-        print("update")
-
-    elif (sqltype == 'delete') :
-        print("delete")
 
 def fcm_datapush(title, body) : 
     data_message = {
@@ -159,11 +62,6 @@ def fcm_datapush(title, body) :
     push_service = FCMNotification(api_key="AAAAKZIq-gg:APA91bFAQi1T8kZRPMiTFol8NG7undfjGOMjw5ebh5QaF3cLbAZQ_XfxSMEo1nF-uThG7sARbtWoZChtoRjWlxhKFLsGcCYY2TT2h8dkX3VnZGFKP9KlfwOBH1ritnBGabzDftMt2Pv9")
     result = push_service.multiple_devices_data_message(registration_ids=listToken, data_message=data_message)
     return result
-
-#firebase realtime database
-thread = None
-duckbase = firebase.FirebaseApplication('https://gradeprojectoreo.firebaseio.com/', None)
-sionbase = firebase.FirebaseApplication('https://graduate-project-c0c01.firebaseio.com/', None)
 
 #raspi cpu temperature
 def get_cpu_temperature():
@@ -183,8 +81,10 @@ def servertime():
     row = mySQL(sqltype=sqltype, tablename=tablename, where=None, value=None, time=None)
     modtime = str(row[1])
     time_s = modtime[0:2] + '-' + modtime[2:4] + '-' + modtime[4:6]
-    print (time_s)
-    return render_template('servertime.html', modtime=time_s, tablename=tablename)
+    #print (time_s)
+    todaytemp, fine_dust, rain_percent = binarysearch.get_weather_now ()
+    aux = binarysearch.get_aux_now ()
+    return render_template('servertime.html', modtime=time_s, tablename=tablename, todaytemp=todaytemp, fine_dust=fine_dust, rain_percent=rain_percent, aux=aux)
 
 @app.route('/fire/<int:input_pistatus>')
 def fire_occurs(input_pistatus):
@@ -207,9 +107,15 @@ def fire_reset():
     fire_pistatus = 0
     return 'Global variable reset to %d' %fire_pistatus
 
-@app.route('/test/<string:text>/')
-def testCall(text):
-    return 'test call : ' + text
+@app.route('/changeweather/<int:case>/')
+def ChangeWeather(case):
+    binarysearch.change_weather_case (case)
+    return 'Weather is now at Case ' + str(case)
+
+@app.route('/changeaux/<int:case>/')
+def ChangeAux(case):
+    binarysearch.change_aux (case)
+    return 'Aux is now at Boolean ' + str(case)
 
 @app.route('/arduino', methods=['GET'])
 def arduino():
@@ -238,10 +144,14 @@ def arduino():
         value2 = request.args.get("value2")
         time = request.args.get("time")
 	
-        if ( sqltype1 != None ) :
+        if ( sqltype1 != None and sqltype1 == 'findvalue_rtc_id' ) :
+            result = binarysearch.bs_findvalue_rtc_id (tablename=table1)
+        elif ( sqltype1 != None ) :
             result = mySQL(sqltype=sqltype1, tablename=table1, where=where1, value=value1, time=time)
 
-        if ( sqltype2 != None ) : 
+        if ( sqltype2 != None and sqltype2 == 'findvalue_rtc_id' ) : 
+            result = binarysearch.bs_findvalue_rtc_id (tablename=table2)
+        elif ( sqltype2 != None ) : 
             result = mySQL(sqltype=sqltype2, tablename=table2, where=where2, value=value2, time=time)
 
         if ( result == 1 ):
@@ -353,6 +263,7 @@ def login_result():
 
 # app run
 if __name__ == '__main__':
+    binarysearch.weather_now()
     app.run(debug=True, host='0.0.0.0', port=11066)
 
     
