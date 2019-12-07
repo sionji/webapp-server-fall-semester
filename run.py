@@ -12,56 +12,13 @@ import json
 #import custom module
 import binarysearch
 from mySQL import *
+from fire import *
 
 app = Flask(__name__)
 
-# fire status global variable
-fire_pistatus = 0
-# maze pointer must be string
-maze_i = '20'
-maze_j = '40'
-#firebase realtime database
-thread = None
-duckbase = firebase.FirebaseApplication('https://gradeprojectoreo.firebaseio.com/', None)
-sionbase = firebase.FirebaseApplication('https://graduate-project-c0c01.firebaseio.com/', None)
-
-def change_fire_case (case) :
-    global maze_i, maze_j
-    # Case sensitivity
-    if (case == 0) :
-        maze_i = '20'
-        maze_j = '40'
-
-    elif (case == 1) :
-        maze_i = '20'
-        maze_j = '40'
-   
-    elif (case == 2) :
-        maze_i = '20'
-        maze_j = '40'
-    
-    elif (case == 3) :
-        maze_i = '20'
-        maze_j = '40'
-   
-    elif (case == 4) :
-        maze_i = '20'
-        maze_j = '40'
-
-
-def fcm_datapush(title, body) : 
-    data_message = {
-            "message_title" : title,
-            "message_body" : body,
-            "message_channel" : "EMERGENCY"
-            }
-    listToken = []
-    usertokens = duckbase.get("/users", None)
-    for k, v in usertokens.items():
-        listToken.append(v["token"])
-    push_service = FCMNotification(api_key="AAAAKZIq-gg:APA91bFAQi1T8kZRPMiTFol8NG7undfjGOMjw5ebh5QaF3cLbAZQ_XfxSMEo1nF-uThG7sARbtWoZChtoRjWlxhKFLsGcCYY2TT2h8dkX3VnZGFKP9KlfwOBH1ritnBGabzDftMt2Pv9")
-    result = push_service.multiple_devices_data_message(registration_ids=listToken, data_message=data_message)
-    return result
+#HTML login variable
+user_id = 'fly'
+user_pw = 'moon'
 
 #raspi cpu temperature
 def get_cpu_temperature():
@@ -260,10 +217,28 @@ def login_result():
         else :
             return render_template("again.html")
 
+@app.route('/loginSuccess/', methods=['POST','GET'])
+def change_we():
+    if request.method == 'POST':
+        if request.form['button_change'] == 'but1' :
+            print("CASE 1")
+        elif request.form['button_change'] == 'but2' :
+            print("CASE 2")
+        elif request.form['button_change'] == 'but3' :
+            print("CASE 3")
+        elif request.form['button_change'] == 'but4' :
+            print("CASE 4")
+        else :
+            print("pass")
+            pass
+        return render_template("loginSuccess.html", user_id = user_id)
+ 
+            
 
 # app run
 if __name__ == '__main__':
-    binarysearch.weather_now()
-    app.run(debug=False, host='0.0.0.0', port=11066)
+    binarysearch.change_weather_case(0)
+    binarysearch.change_aux (1)
+    app.run(debug=True, host='0.0.0.0', port=11066)
 
     
