@@ -14,29 +14,30 @@ sionbase = firebase.FirebaseApplication('https://graduate-project-c0c01.firebase
 
 def change_fire_case (case) :
     global fire_pistatus, maze_i, maze_j
+    fire_pistatus = case
     # Case sensitivity
     if (case == 0) :
         maze_i = '20'
         maze_j = '40'
 
     elif (case == 1) :
-        maze_i = '20'
-        maze_j = '40'
+        maze_i = '34'
+        maze_j = '20'
    
     elif (case == 2) :
-        maze_i = '20'
-        maze_j = '40'
+        maze_i = '13'
+        maze_j = '15'
     
     elif (case == 3) :
-        maze_i = '20'
-        maze_j = '40'
+        maze_i = '11'
+        maze_j = '37'
    
     elif (case == 4) :
-        maze_i = '20'
-        maze_j = '40'
+        maze_i = '14'
+        maze_j = '67'
 
     f = open ("./info/fireinfo.txt", "w")
-    data = "fire=%d\nx=%d\ny=%d"%(fire_pistatus, maze_i, maze_j)
+    data = "fire=%d\nx=%s\ny=%s"%(fire_pistatus, maze_i, maze_j)
     f.write (data)
     f.close ()
 
@@ -49,18 +50,18 @@ def read_fire_info () :
         fire = int (line[5:])
         line = file.readline ()
         line = line.strip ('\n')
-        x = int (line[2:])
+        x = str (line[2:])
         line = file.readline ()
         line = line.strip ('\n')
-        y = int (line[2:])
+        y = str (line[2:])
         fire_pistatus = fire
         maze_i = x
         maze_j = y
 
 def get_fire_now () :
-    global maze_i, maze_j
+    global fire_pistatus, maze_i, maze_j
     read_fire_info ()
-    return maze_i, maze_j
+    return fire_pistatus, maze_i, maze_j
 
 def fcm_datapush(title, body) : 
     data_message = {

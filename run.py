@@ -2,12 +2,12 @@
 #import official module
 from flask import Flask, render_template, url_for, request, redirect
 from subprocess import call, PIPE, Popen
-from firebase import firebase
-from pyfcm import FCMNotification
-from datetime import datetime
+#from firebase import firebase
+#from pyfcm import FCMNotification
+#from datetime import datetime
 import requests
 import psutil
-import json
+#import json
 
 #import custom module
 import binarysearch
@@ -26,13 +26,12 @@ def get_cpu_temperature():
     output, _error = process.communicate()
     return float(output[output.index('=') + 1 : output.rindex("'")])
 
-
 @app.route('/')
 def basic():
     return 'Fly to the Moon Graduate Project'
 
 @app.route('/servertime/', methods=['GET'])
-def servertime():
+def servertime ():
     sqltype = 'findtime_id' 
     tablename = request.args.get("table1")
     row = mySQL(sqltype=sqltype, tablename=tablename, where=None, value=None, time=None)
@@ -43,26 +42,21 @@ def servertime():
     aux = binarysearch.get_aux_now ()
     return render_template('servertime.html', modtime=time_s, tablename=tablename, todaytemp=todaytemp, fine_dust=fine_dust, rain_percent=rain_percent, aux=aux)
 
-@app.route('/fire/<int:input_pistatus>')
-def fire_occurs(input_pistatus):
-    global fire_pistatus
-    # fire_pistatus and input_pistatus is int type data
-    if (fire_pistatus == 0 and input_pistatus == 1) :
-        fire_pistatus = input_pistatus
-        duckbase.patch('/maze/f1', {'i' : "20"})
-        duckbase.patch('/maze/f1', {'j' : "40"})
+@app.route('/changefire/<int:case>')
+def ChangeFire (case):
+    old_status, maze_i, maze_j = get_fire_now ()
+    change_fire_case (case)
+    status, maze_i, maze_j = get_fire_now ()
+    if (case == 0) :
+        return 'Fire status is now at 0. '
+    elif (old_status == 0 and case != 0) :
+        duckbase.patch('/maze/f1', {'i' : maze_i})
+        duckbase.patch('/maze/f1', {'j' : maze_j})
         message = fcm_datapush('Fire Occured!', 'Touch to see evacuation route.')
         print(message)
-        return 'Global variable is %d' % fire_pistatus
-    
+        return 'Fire status is now at %d' % status
     else :
-        return 'Global variable is %d' % fire_pistatus
-
-@app.route('/fire/reset', methods=['GET'])
-def fire_reset():
-    global fire_pistatus
-    fire_pistatus = 0
-    return 'Global variable reset to %d' %fire_pistatus
+        return 'You make status 0 first.'
 
 @app.route('/changeweather/<int:case>/')
 def ChangeWeather(case):

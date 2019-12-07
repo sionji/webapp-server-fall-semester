@@ -1,3 +1,3 @@
-todaytemp=8
+todaytemp=7
 fine_dust=17
 rain_percent=0
