@@ -13,22 +13,64 @@
       </form>
 
     <form action="http://155.230.25.126:11066/loginSuccess/" method="POST">
-      <div class="button" style="position:absolute; top: 10%; left:200px;">
+      <div style="position:absolute; top:55px"> 날씨상태: {{weather_case}} &nbsp; &nbsp; AUX 상태:{{AUX_case}}</div>
+<!--      <div style="position:absolute; top:75px"> 자동문1: {{door1}} &nbsp; 자동문2:{{door2}} &nbsp; 자동문3:{{door3}} &nbsp; 자동문4:{{door4}} </div>
+-->  
+      <div class="button" style="position:absolute; top:100px">
+        <button type="submit" name="button_change" value="AUX0">AUX_0</button>
+      </div>
+
+      <div class="button" style="position:absolute; top:100px; left:75px">
+        <button type="submit" name="button_change" value="AUX1">AUX_1</button>
+      </div>
+      
+      <div class="button" style="position:absolute; top:100px; left:145px">
+        <button type="submit" name="button_change" value="AUX2">AUX_2</button>
+      </div>
+
+
+      <div class="button" style="position:absolute; top: 150px; left:200px;">
+        <td><label for="name">Weather 0</label></td>
+        <button type="submit" name="button_change" value="but0">CHANGE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 225px; left:200px;">
         <td><label for="name">Weather 1</label></td>
         <button type="submit" name="button_change" value="but1">CHANGE</button>
       </div>
-      <div class="button" style="position:absolute; top: 20%; left:200px;">
+      <div class="button" style="position:absolute; top: 300px; left:200px;">
         <td><label for="name">Weather 2</label></td>
         <button type="submit" name="button_change" value="but2">CHANGE</button>
       </div>
-      <div class="button" style="position:absolute; top: 30%; left:200px;">
+      <div class="button" style="position:absolute; top: 375px; left:200px;">
         <td><label for="name">Weather 3</label></td>
-        <button type="submit" name="button_change" value="but3">CHANGE</button>
+        <button type="submit" name="button_change" value = "but3">CHANGE</button>
       </div>
-      <div class="button" style="position:absolute; top: 40%; left:200px;">
+      <div class="button" style="position:absolute; top: 450px; left:200px;">
         <td><label for="name">Weather 4</label></td>
         <button type="submit" name="button_change" value = "but4">CHANGE</button>
       </div>
+<!--
+      <div class="button" style="position:absolute; top: 150px; left:400px;">
+        <td><label for="name">자동문1</label></td>
+        <button type="submit" name="button_change" value="door1_open">OPEN</button>
+        <button type="submit" name="button_change" value="door1_close">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 225px; left:400px;">   
+        <td><label for="name">자동문2</label></td>
+        <button type="submit" name="button_change" value="door2_open">OPEN</button>
+        <button type="submit" name="button_change" value="door2_close">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 300px; left:400px;">
+        <td><label for="name">자동문3</label></td>
+        <button type="submit" name="button_change" value="door3_open">OPEN</button>
+        <button type="submit" name="button_change" value="door3_close">CLOSE</button>
+      </div>
+      <div class="button" style="position:absolute; top: 375px; left:400px;">  
+        <td><label for="name">자동문4</label></td>
+        <button type="submit" name="button_change" value="door4_open">OPEN</button>
+        <button type="submit" name="button_change" value="door4_close">CLOSE</button>
+      </div>
+-->
     </form>
   </body>
 </html>

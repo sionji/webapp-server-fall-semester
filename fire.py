@@ -17,8 +17,8 @@ def change_fire_case (case) :
     fire_pistatus = case
     # Case sensitivity
     if (case == 0) :
-        maze_i = '20'
-        maze_j = '40'
+        maze_i = '100'
+        maze_j = '100'
 
     elif (case == 1) :
         maze_i = '34'

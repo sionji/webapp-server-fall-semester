@@ -19,6 +19,12 @@ app = Flask(__name__)
 #HTML login variable
 user_id = 'fly'
 user_pw = 'moon'
+weather_case = 'CASE 0'
+AUX_case = 'CASE 1'
+door1 = 'default'
+door2 = 'default'
+door3 = 'default'
+door4 = 'default'
 
 #raspi cpu temperature
 def get_cpu_temperature():
@@ -48,6 +54,8 @@ def ChangeFire (case):
     change_fire_case (case)
     status, maze_i, maze_j = get_fire_now ()
     if (case == 0) :
+        duckbase.patch('/maze/f1', {'i' : maze_i})
+        duckbase.patch('/maze/f1', {'j' : maze_j})
         return 'Fire status is now at 0. '
     elif (old_status == 0 and case != 0) :
         duckbase.patch('/maze/f1', {'i' : maze_i})
@@ -70,7 +78,6 @@ def ChangeAux(case):
 
 @app.route('/arduino', methods=['GET'])
 def arduino():
-    global fire_pistatus
     sqltype1 = None
     sqltype2 = None
     table1 = None
@@ -80,8 +87,10 @@ def arduino():
     value1 = None
     value2 = None
     time = None
-    if (fire_pistatus == 1) :
+    fire_pistatus, maze_i, maze_j = get_fire_now ()
+    if (fire_pistatus > 0) :
         # if fire_pistatus is int 1, then return string 1
+        print ("Fire occured!")
         return 'y'
 
     elif request.method == 'GET' :
@@ -115,14 +124,13 @@ def arduino():
 
 @app.route('/arduino/web', methods=['GET'])
 def arduino_web():
-    global fire_pistatus
     sqltype = None
     tablename = None
     where = None
     value = None
     time = None
-
-    if (fire_pistatus == 1) :
+    fire_pistatus, maze_i, maze_j = get_fire_now ()
+    if (fire_pistatus > 0) :
         # if fire_pistatus is int 1, then return string 1
         return '1'
 
@@ -207,25 +215,68 @@ def login_result():
         user_id = request.form['user_id']
         user_pw = request.form['user_pw']
         if user_id == 'fly' and user_pw == 'moon' :
-            return render_template("loginSuccess.html", user_id = user_id)
+            return render_template("loginSuccess.html", user_id = user_id,weather_case=weather_case, AUX_case=AUX_case, door1=door1,door2=door2,door3=door3,door4=door4)
         else :
             return render_template("again.html")
 
 @app.route('/loginSuccess/', methods=['POST','GET'])
 def change_we():
     if request.method == 'POST':
-        if request.form['button_change'] == 'but1' :
+        global weather_case
+        global AUX_case
+        global door1,door2,door3,door4
+        if request.form['button_change'] == 'but0' :
+            binarysearch.change_weather_case(0)
+            weather_case='CASE 0'
+            print("CASE 0")
+        elif request.form['button_change'] == 'but1' :
+            binarysearch.change_weather_case(1)
+            weather_case='CASE 1'
             print("CASE 1")
         elif request.form['button_change'] == 'but2' :
+            binarysearch.change_weather_case(2)
+            weather_case='CASE 2'
             print("CASE 2")
         elif request.form['button_change'] == 'but3' :
+            binarysearch.change_weather_case(3)
+            weather_case='CASE 3'
             print("CASE 3")
         elif request.form['button_change'] == 'but4' :
+            binarysearch.change_weather_case(4)
+            weather_case='CASE 4'
             print("CASE 4")
+        elif request.form['button_change'] == 'AUX0' :
+            AUX_case = 'CASE 0'
+            binarysearch.change_aux(0)
+            print("AUX_CASE 0")
+        elif request.form['button_change'] == 'AUX1' :
+            AUX_case = 'CASE 1'
+            binarysearch.change_aux(1)
+            print("AUX_CASE 0")
+        elif request.form['button_change'] == 'AUX2' :
+            AUX_case = 'CASE 2'
+            binarysearch.change_aux(2)
+            print("AUX_CASE 2")
         else :
-            print("pass")
-            pass
-        return render_template("loginSuccess.html", user_id = user_id)
+            if request.form['button_change'] == 'door1_open' :
+                door1='OPEN'
+            elif request.form['button_change'] == 'door1_close' :
+                door1='CLOSE'
+            elif request.form['button_change'] == 'door2_open' :
+                door2='OPEN'
+            elif request.form['button_change'] == 'door2_close' :
+                door2='CLOSE'
+            elif request.form['button_change'] == 'door3_open' :
+                door3='OPEN'
+            elif request.form['button_change'] == 'door3_close' :
+                door3='CLOSE'
+            elif request.form['button_change'] == 'door4_open' :
+                door4='OPEN'
+            elif request.form['button_change'] == 'door4_close' :
+                door4='CLOSE'
+            else :
+                pass
+        return render_template("loginSuccess.html", user_id = user_id,weather_case=weather_case, AUX_case=AUX_case, door1=door1,door2=door2,door3=door3,door4=door4)
  
             
 
