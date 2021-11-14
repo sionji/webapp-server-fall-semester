@@ -1,22 +1,31 @@
 # Webapp_server_with_Flask
  Web app server which communicate with firebase, using Python, Flask, Apache.
  <br />
- The goal of this project is webapp server which communicates with Arduino, Firebase Realtime Database.
+ The goal of this project is implementing webapp server which communicates with Arduino, Firebase Realtime Database.
  Arduino is connected with WiFi module(ESP-8086-01) and gives some information to Pi webapp server.
  Firebase push notification alarm when realtime database is renewed.
- If you want to see a codes on Arduino, please click here :
- ```
- ```
-
- <br />
- If you want to see a codes on Firebase(Notification), please click here : 
-
- ```
- ```
-
+ 
+ * run.py : Communication with client(Arduino), access to MySQL, and Update the fire information.
+ * mySQL.py : Establishes a connection to MySQL and executes a query for HTTP requests.
+ * fire.py : When emergencyu situation is occured, the situation is saved in server and send emergency push alarm to Google Firebase.
+ * bs.py : Beautiful Soup, a Python library that parses HTML, crawls Naver weather information and update it.
+ * templates : HTTP templates.
+ * info : files containing a information such as emergency situation, weather information.
+ 
  <br />
  <br />
 
+# What this code does is
+ * HTTP communication with Arduino (GET type)
+ * Realtime Database data upload
+ * HTTP Communication using Python Flask
+ * Notifying multiple devices using Data request
+ * DB Access using pymysql
+
+ <br />
+ <br />
+
+# Brief Setup guide for RaspberryPi
 ## Install Raspbian
  This project works using Raspiban OS.
  You can download an install file on site below :
@@ -37,10 +46,6 @@
  Clients must access through your router ip address and certain port number,
  then router interprets the request (make connection with your Pi), finally, clients can communicate with Pi.
  This is port forwarding.
- You can follow the process easily. Please see link below:
- ```
- ```
- <br />
 
 ### 2) Raspbian Firewall Configuration
  I think that your Pi initially installed the firewall when you downloaded raspbian OS full package.
@@ -99,33 +104,3 @@
  <br />
 
  You should allow SSH, VNC on raspi-config.
-
-
-## Basic Flask Structure
- ```
- ```
-
-
-## HTTP communication with Arduino (GET type)
-
-
-
-## Realtime Database data upload
-
-
-
-## HTTP Communication using Python Flask
-
-
-
-
-## Notifying multiple devices using Data request
-
-
-
-## Install MySQL(Maria DB)
-
-
-## Set Password, Make DB and tables
-
-## DB Access using pymysql
