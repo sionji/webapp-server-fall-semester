@@ -16,11 +16,10 @@
  <br />
 
 # What this code does is
- * HTTP communication with Arduino (GET type)
- * Realtime Database data upload
- * HTTP Communication using Python Flask
- * Notifying multiple devices using Data request
+ * HTTP communication with Arduino using Python Flask
  * DB Access using pymysql
+ * Search, Insert, Update data in MySQL in realtime
+ * Send push notification to multiple devices through connection with Google Firebase
 
  <br />
  <br />
@@ -32,7 +31,6 @@
  ```
  https://www.raspberrypi.org/downloads/raspbian/
  ```
- <br />
  <br />
 
 ## Conneting with SSH, mstsc (Window OS)
